@@ -10,8 +10,11 @@ function SignIn() {
   const router = useRouter();
   const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, provider);
+    // const data = result.user;
+  console.log(result,"userdata")
     cookies.set("auth-token", result.user.refreshToken);
     router.push("/room");
+  
   };
   return (
     <>

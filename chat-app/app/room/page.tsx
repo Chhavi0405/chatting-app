@@ -1,11 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter} from "next/navigation";
-
+import {auth} from "../../firebase.config";
 function Room() {
   const [roomId, setRoomId] = useState("");
   const router = useRouter();
- 
+  const userdata:any = auth.currentUser?.uid
+
   return (
     <>
       <div>

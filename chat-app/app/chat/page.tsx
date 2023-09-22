@@ -9,14 +9,15 @@ import { addDoc,
   orderBy,
   query,
   serverTimestamp,
-  where, } from 'firebase/firestore';
+  where,
+  updateDoc, } from 'firebase/firestore';
   import { useRouter,useSearchParams} from "next/navigation";
 function Chat() {
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const messagesRef: any = collection(db, "messages");
   const router = useRouter();
-
+  const [filterRoom,setFilterRoom] = useState([])
   const searchParams = useSearchParams();
   const room = searchParams?.get("room");
   console.log(room,"params")
@@ -24,11 +25,16 @@ function Chat() {
   useEffect(() => {
     const queryMessages = query(messagesRef, orderBy('createdAt'));
     const unsuscribe: any = onSnapshot(queryMessages, (snapshot) => {
-      let messages: any = [];
+      let mess: any = [];
       snapshot.forEach((doc: any) => {
-        messages.push({ ...doc.data(), id: doc.id });
+        mess.push({ ...doc.data(), id: doc.id });
       });
-      setMessages(messages);
+      let x:any
+      const filterRooms = mess.filter((data: any) => data?.room === room);
+      console.log(filterRooms ,"filtered")
+      console.log(mess,"effect")
+      setMessages(mess);
+      setFilterRoom(filterRooms)
     });
     return () => unsuscribe;
   },[]);
@@ -38,12 +44,12 @@ function Chat() {
     if (newMessage === "") return;
 
     await addDoc(messagesRef, {
+      
       text: newMessage,
       createdAt: serverTimestamp(),
       user: auth.currentUser?.displayName,
       room
     });
-    
 
     setNewMessage("");
   };
@@ -53,8 +59,9 @@ function Chat() {
 <section>
   Welcome to room :{room}
 </section>
+
 <div> { 
-    messages.map( (msg :any) => {
+    filterRoom.map( (msg :any) => {
         console.log(msg,"msg");
         return <div  key={msg.id} > 
         <span>{msg.user} : </span>
